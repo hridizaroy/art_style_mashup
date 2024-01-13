@@ -1,0 +1,55 @@
+/**
+* @author Hridiza Roy
+* @description a MEL script that will give a clay-look to all meshes in a scene
+*/
+
+// Create new standard surface material
+string $surfaceName = `shadingNode -asShader standardSurface`;
+string $surfaceSGName = ($surfaceName + "SG");
+sets -renderable true -noSurfaceShader true -empty -name $surfaceSGName;
+connectAttr -f ($surfaceName + ".outColor") ($surfaceSGName + ".surfaceShader");
+
+// Import noise image
+string $filename = `shadingNode -asTexture -isColorManaged file`;
+string $textureName = `shadingNode -asUtility place2dTexture`;
+
+connectAttr -f ($textureName + ".coverage") ($filename + ".coverage");
+connectAttr -f ($textureName + ".translateFrame") ($filename + ".translateFrame");
+connectAttr -f ($textureName + ".rotateFrame") ($filename + ".rotateFrame");
+connectAttr -f ($textureName + ".mirrorU") ($filename + ".mirrorU");
+connectAttr -f ($textureName + ".mirrorV") ($filename + ".mirrorV");
+connectAttr -f ($textureName + ".stagger") ($filename + ".stagger");
+connectAttr -f ($textureName + ".wrapU") ($filename + ".wrapU");
+connectAttr -f ($textureName + ".wrapV") ($filename + ".wrapV");
+connectAttr -f ($textureName + ".repeatUV") ($filename + ".repeatUV");
+connectAttr -f ($textureName + ".offset") ($filename + ".offset");
+connectAttr -f ($textureName + ".rotateUV") ($filename + ".rotateUV");
+connectAttr -f ($textureName + ".noiseUV") ($filename + ".noiseUV");
+connectAttr -f ($textureName + ".vertexUvOne") ($filename + ".vertexUvOne");
+connectAttr -f ($textureName + ".vertexUvTwo") ($filename + ".vertexUvTwo");
+connectAttr -f ($textureName + ".vertexUvThree") ($filename + ".vertexUvThree");
+connectAttr -f ($textureName + ".vertexCameraOne") ($filename + ".vertexCameraOne");
+connectAttr ($textureName + ".outUV") ($filename + ".uv");
+connectAttr ($textureName + ".outUvFilterSize") ($filename + ".uvFilterSize");
+
+setAttr ($filename + ".fileTextureName") -type "string" "clay_noise_profile.jpg";
+
+// Create new displacement shader
+string $clayDisplacementShader = `shadingNode -asShader displacementShader`;
+// Connect Red Channel of texture file to displacement shader
+connectAttr -f ($filename + ".outColorR") ($clayDisplacementShader + ".displacement");
+
+
+// Get all meshes in the scene
+string $meshes[] = `ls -type mesh`;
+
+// Connect clay shader to displacement shader of each mesh
+for ($mesh in $meshes)
+{
+    // Add clay displacement shader
+    string $shadingGroups[] = `listConnections -t "shadingEngine" $mesh`;
+    string $shadingGroup = $shadingGroups[0];
+
+    // Connect clay displacement shader to the surface's displacement shader
+    connectAttr -f ($clayDisplacementShader + ".displacement") ($shadingGroup + ".displacementShader");
+}
