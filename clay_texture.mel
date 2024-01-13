@@ -3,6 +3,8 @@
 * @description a MEL script that will give a clay-look to all meshes in a scene
 */
 
+string $clayTextureFile = "clay_texture.jpg";
+
 // Create new standard surface material
 string $surfaceName = `shadingNode -asShader standardSurface`;
 string $surfaceSGName = ($surfaceName + "SG");
@@ -32,7 +34,7 @@ connectAttr -f ($textureName + ".vertexCameraOne") ($filename + ".vertexCameraOn
 connectAttr ($textureName + ".outUV") ($filename + ".uv");
 connectAttr ($textureName + ".outUvFilterSize") ($filename + ".uvFilterSize");
 
-setAttr ($filename + ".fileTextureName") -type "string" "clay_noise_profile.jpg";
+setAttr ($filename + ".fileTextureName") -type "string" $clayTextureFile;
 
 // Create new displacement shader
 string $clayDisplacementShader = `shadingNode -asShader displacementShader`;
@@ -52,4 +54,7 @@ for ($mesh in $meshes)
 
     // Connect clay displacement shader to the surface's displacement shader
     connectAttr -f ($clayDisplacementShader + ".displacement") ($shadingGroup + ".displacementShader");
+
+    // TODO: Smooth each mesh
+    // TODO: Change specular roughness of already existing material
 }
