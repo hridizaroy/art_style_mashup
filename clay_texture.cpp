@@ -2,7 +2,7 @@
  * @file clay_texture.cpp
  * @author Hridiza Roy (hridizaroy@gmail.com)
  * @brief This is a Maya Plugin that will give a clay-look to all meshes in a scene
- * @version 0.1
+ * @version 1.1
  * @date 2024-01-14
  * 
  * @copyright Copyright (c) 2024
@@ -63,7 +63,7 @@ void* ClayTexture::creator()
 
 MStatus initializePlugin(MObject obj)
 {
-    MFnPlugin plugin(obj, "Autodesk", "1.0", "Any");
+    MFnPlugin plugin(obj, "Autodesk", "1.1", "Any");
     plugin.registerCommand(ClayTexture::commandName, ClayTexture::creator);
     return MS::kSuccess;
 }
